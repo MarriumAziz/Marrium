@@ -1,0 +1,119 @@
+///////////// TABLE OF REGISTER////////////
+
+create table register(
+         register_ID int not null,
+         first_name varchar(30),
+         last_name varchar(30),
+         Email varchar(50) unique,
+         username varchar(20) unique,
+         password varchar(20),
+         code varchar(10),
+         CONSTRAINT register_pk primary key(register_ID)
+         );
+         
+         
+///////////TABLE OF LOGIN///////////////
+
+create table login(
+          accountid int not null,
+          username varchar(20) unique,
+          password char(32),
+          register_ID int,
+          CONSTRAINT login_pk primary key(accountid),
+          CONSTRAINT login_fk FOREIGN KEY(register_ID) references register(register_ID)
+          );
+
+          
+//////////TABLE OF PETITIONER//////////       
+
+
+create table petitioner(
+         NIC varchar(20) not null,
+         name varchar(50) not null,
+         father_name varchar(50),
+         address varchar(100),
+         contact int,
+         CONSTRAINT petitioner_pk primary key(NIC,name));
+         
+         
+
+/////////TABLE OF INVESTIGATION OFFICER//////
+create table investigation_officer(
+         officer_ID int unique,
+         name varchar(50),
+         rank int,
+         accountid int,
+         CONSTRAINT investigation_officer_pk primary key(officer_ID),
+         CONSTRAINT investigation_officer_fk FOREIGN KEY(accountid) references login(accountid)
+         );
+
+         
+////////////TABLES OF VICTIM////////////
+
+
+
+create table victim(
+      name varchar(50),
+      address varchar(50),
+      father_name varchar(50),
+      contact varchar(50),
+      CONSTRAINT victim_pk primary key(name,address)
+      );
+
+
+
+/////////TABLE OF FIR////////////      
+
+
+create table FIR(
+       fir_ID int unique,
+       incident_date DATE not null,
+       incident_time TIMESTAMP,
+       incident_place varchar(20),
+       time_lodged TIMESTAMP,
+       date_lodged DATE not null,
+       petitioner_ID varchar(20),
+       victim_name varchar(30),
+       victim_address varchar(100),
+       petitioner_name varchar(50),
+       CONSTRAINT FIR_pk primary key(fir_ID),
+       CONSTRAINT FIR_fk FOREIGN KEY(victim_name,victim_address) references victim(name,address),
+       CONSTRAINT FIR_fk1 FOREIGN KEY (petitioner_name,petitioner_ID) references petitioner(NIC,name)
+       );
+      
+
+////////////TABLE OF CASES///////////
+
+
+create table cases(
+        case_ID int unique,
+        section_law varchar(10),
+        case_status varchar(5) CHECK(case_status IN ('open','close')),
+        case_detail  varchar(100),
+        officer_ID int,
+        fir_ID int,
+        CONSTRAINT case_pk primary key(case_ID),
+        CONSTRAINT case_fk FOREIGN KEY(fir_ID) references FIR(fir_ID),
+        CONSTRAINT case_fk1 FOREIGN KEY(officer_ID) references investigation_officer(officer_ID)
+        );
+
+        
+         
+/////////////////TABLE OF ACCUSED///////////////      
+         
+         
+
+create table accused(
+       accused_ID int not null,
+       name varchar(50),
+       father_name varchar(50),
+       NIC varchar(15),
+       status varchar(10) CHECK(status IN('Arrested','Bailed','Released','Escape')),
+       gender varchar(2) CHECK(gender IN('M','F')),
+       age int CHECK (age<120),
+       contact varchar(50) not null,
+       photo blob,
+       fir_ID int,
+       CONSTRAINT accused_pk primary key(accused_ID),
+       CONSTRAINT accused_fk FOREIGN KEY(fir_ID) references FIR(fir_ID)
+       );
